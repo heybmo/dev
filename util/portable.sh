@@ -17,8 +17,17 @@ function portable::Has() {
     type "${1-}" >/dev/null 2>&1;
 }
 
+function portable::File_exists() {
+    if [ "$#" -ne 1 ]; then
+        portable::Echo "Invalid number of arguments.";
+        return 1;
+    fi
+
+    if [ -e "$1" ] && return 0 || return 1;
+}
+
 function portable::Has_non_aliased() {
-    nvm_has "${1-}" && ! nvm_is_alias "${1-}";
+    portable::Has "${1-}" && ! nvm_is_alias "${1-}";
 }
 
 function portable::Is_alias() {
@@ -35,25 +44,61 @@ function portable::Has_color_support() {
 }
 
 function portable::Which_shell() {
-    unameOut="$(uname -s)"
+    local unameOut="$(uname -s)"
     case "${unameOut}" in
-        Linux*)     machine=Linux;;
-        Darwin*)    machine=Mac;;
-        CYGWIN*)    machine=Cygwin;;
-        MINGW*)     machine=MinGw;;
-        *)          machine="UNKNOWN:${unameOut}"
+        Linux*)     local machine=Linux;;
+        Darwin*)    local machine=Mac;;
+        CYGWIN*)    local machine=Cygwin;;
+        MINGW*)     local machine=MinGw;;
+        *)          local machine="UNKNOWN:${unameOut}"
     esac
-    echo ${machine}
+    echo ${machine};
+    return 0;
 }
 
 function portable::Contains() {
-    string="$1"
-    substring="$2"
-    if test "${string#*$substring}" != "$string"
-    then
+    local string="$1"
+    local substring="$2"
+    
+    if [ "$#" -ne 2 ]; then
+        portable::Echo "Invalid number of arguments.";
+        exit 1;
+    fi
+
+    if test "${string#*$substring}" != "$string"; then
         return 0    # $substring is in $string
     else
         return 1    # $substring is not in $string
     fi
+}
+
+function portable::Starts_with() {
+    local string="$1"
+    local substring="$2"
+
+    if [ "$#" -ne 2 ]; then
+        portable::Echo "Invalid number of arguments.";
+        return 1;
+    fi
+
+    case "$string" in
+        "$substring"*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+function portable::Ends_with() {
+    local string="$1";
+    local substring="$2";
+
+    if [ "$#" -ne 2 ]; then
+        portable::Echo "Invalid number of arguments.";
+        return 1;
+    fi
+
+    case "$string" in
+        *"$substring") return 0 ;;
+        *) return 1 ;;
+    esac
 }
 
