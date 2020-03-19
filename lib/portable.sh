@@ -10,7 +10,13 @@ function portable::Is_bash() {
 }
 
 function portable::Echo() {
-    command printf %s\\n "$*" 2>/dev/null;
+    command printf %s\\n "$*";
+    return 0;
+}
+
+function portable::Die() {
+    portable::Echo "$*";
+    exit 1;
 }
 
 function portable::Has() {
@@ -24,6 +30,15 @@ function portable::File_exists() {
     fi
 
     if [ -e "$1" ] && return 0 || return 1;
+}
+
+function portable::Command_exists() {
+    if [ "$#" -ne 1 ]; then
+        portable::Echo "Invalid number of arguments.";
+        return 1;
+    fi
+
+    command -v "$1";
 }
 
 function portable::Has_non_aliased() {
@@ -62,13 +77,13 @@ function portable::Contains() {
     
     if [ "$#" -ne 2 ]; then
         portable::Echo "Invalid number of arguments.";
-        exit 1;
+        return 1;
     fi
 
     if test "${string#*$substring}" != "$string"; then
-        return 0    # $substring is in $string
+        return 0;    # $substring is in $string
     else
-        return 1    # $substring is not in $string
+        return 1;    # $substring is not in $string
     fi
 }
 

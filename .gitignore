@@ -1,0 +1,11 @@
+# Ignore all _*.sh, *.local.sh, *.private.sh files
+_*.sh
+*.local.sh
+*.private.sh
+
+# Ignore key directories
+**keys/**
+**configs/**
+
+# Ignore backup directory.
+.backup/**
